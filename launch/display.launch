@@ -1,0 +1,47 @@
+<launch>
+    <!-- LAUNCH INTERFACE -->
+    <arg name="robot_name" default="soma"/>
+    <arg name="use_rviz" default="true"/>
+    <arg name="use_joint_state_publisher" default="true"/>
+    <arg name="use_calibration_package" default="true"/>
+    <arg name="start_openni2" default="true"/>
+    
+    <!-- choose whether or not to start the full robot simulation -->
+    <arg name="use_robot_sim" default="true"/>
+
+    <!-- LAUNCH IMPLEMENTATION -->
+
+    <!-- #### -->
+    <param name="robot_description" command="$(find xacro)/xacro.py $(find soma_experiments)/robot/$(arg robot_name).urdf.xacro use_mimic_tag:=false"/>
+
+    <group if="$(arg use_joint_state_publisher)">
+        <node name="joint_state_publisher" pkg="joint_state_publisher" type="joint_state_publisher">
+            <param name="use_gui" value="true"/>
+        </node>
+    </group>
+
+    <param name="publish_frequency" value="100"/>
+    <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher"  />
+
+    <group if="$(arg use_rviz)">
+        <node name="my_rviz" pkg="rviz" type="rviz" respawn="false" args="-d $(find soma_experiments)/launch/rviz_config.rviz" output="screen"/>
+    </group>
+
+    <node name="spawn_urdf" pkg="gazebo_ros" type="spawn_model" args="-param robot_description -urdf -model $(arg robot_name) -x 0 -y 0 -z 1.0 -R 0 -P 0 -Y 0" respawn="false" output="screen"/>
+
+    <!-- load Gazebo simulation environment -->
+    <include file="$(find gazebo_ros)/launch/empty_world.launch">
+        <arg name="world_name" value="$(find soma_experiments)/worlds/simple_environment.world"/>
+        <arg name="paused" value="false"/>
+        <!-- when using the real/sim scenario in parallel, set "use_enabled_time" to false -->
+        <arg name="use_sim_time" value="true"/>
+        <arg name="gui" value="false"/>
+        <arg name="headless" value="true"/>
+        <arg name="debug" value="false"/>
+    </include>
+
+    <include file="$(find soma_experiments)/launch/soma_calibration.launch">
+        <arg name="start_openni2" value="$(arg start_openni2)"/>
+    </include>
+
+</launch>

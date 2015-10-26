@@ -1,0 +1,17 @@
+<launch>
+
+	<arg name="use_robot_sim" default="true"/>
+	<arg name="calibration_name" default="soma_calibration"/>
+  <arg name="asus" default="asus1"/>
+
+	<include file="$(find openni2_launch)/launch/openni2.launch">
+		<arg name="depth_registration" value="true" />
+		<arg name="color_depth_synchronization" value="true" />
+		<arg name="load_driver" value="false"/>
+		<arg name="rgb_camera_info_url" value="file://$(find calibration)/config/intrinsics/rgb_$(arg asus).yaml"/>
+		<arg name="depth_camera_info_url" value="file://$(find calibration)/config/intrinsics/depth_$(arg asus).yaml"/>
+	</include>
+
+	<node name="soma_rviz" pkg="rviz" type="rviz" respawn="false" args="-d $(find soma_experiments)/launch/rviz.rviz" output="screen"/>
+
+</launch>

@@ -1,0 +1,9 @@
+<launch>
+ 
+ <rosparam command="load" file="$(find soma_experiments)/config/camera_params.yaml" />
+ <arg name="spin_rate" default="50" />
+	<node name="scene_filter_node" pkg="desperate_housewife" type="scene_filtering" output="screen" >
+    <param name="spin_rate" value="$(arg spin_rate)" />
+  </node>
+
+</launch>
